@@ -76,11 +76,16 @@ module.exports = function (target, opts) {
 
 	args.push(target);
 
+	console.log('Spawning:', cmd, args.join(' '));
 	var cp = childProcess.spawn(cmd, args, cpOpts);
 
 	if (opts.wait) {
 		return new Promise(function (resolve, reject) {
 			cp.once('error', reject);
+
+			cp.stderr.on('data', function (data) {
+				console.error('Error info:', data.toString());
+			});
 
 			cp.once('close', function (code) {
 				if (code > 0) {
